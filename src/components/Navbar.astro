@@ -1,0 +1,62 @@
+---
+---
+
+
+<nav>
+    <header>
+        <div class="col">
+            <h1>AutoDoc.</h1>
+        </div>
+        <div class="col center">Menu</div>
+        <div class="col right">Log In</div>
+    </header>
+</nav>
+
+<style>
+    nav {
+        --navbar-height: 4rem;
+        /*transform: translateY(-100%) translateZ(0px);*/
+        --tw-backdrop-saturate: saturate(1.5);
+        height: auto;
+        top: 0;
+        left: 0;
+        right: 0;
+        position: sticky;
+    }
+
+    header {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        gap: 1em;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: nowrap;
+        flex-direction: row;
+        max-width: 1024px;
+        width: 100%;
+        display: flex;
+        z-index: 40;
+        position: relative;
+    }
+
+    .col {
+        text-decoration-line: none;
+        background-color: transparent;
+        white-space: nowrap;
+        justify-content: center;
+        align-items: center;
+        display:flex;
+        gap: 1rem;
+        flex-wrap: nowrap;
+        flex-direction: row;
+        height: 100%;
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    .right {
+        text-align: right;
+    }
+</style>

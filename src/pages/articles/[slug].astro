@@ -1,0 +1,34 @@
+---
+import { ArticleQueries } from '@domain'
+import Card from '@components/Card.astro'
+import Layout from '@layouts/Layout.astro'
+import { match } from 'shulk'
+
+const { db } = Astro.locals
+
+const { slug } = Astro.params
+
+const fetchArticleResult = await ArticleQueries(db).fromSlug(slug as string)
+
+const title = fetchArticleResult
+	.map((article) => article.title)
+	.mapErr(() => 'Error').val
+
+fetchArticleResult.mapErr((err) => console.error(err))
+---
+
+<Layout title={title}>
+	{
+		match(fetchArticleResult).case({
+			Err: ({ val: err }) => (
+				<Card error>
+					{match(err.constructor.name).case({
+						NotFound: () => 'Article not found.',
+						_otherwise: () => 'An unexpected error has occured.',
+					})}
+				</Card>
+			),
+			Ok: ({ val: article }) => <p>{article.title}</p>,
+		})
+	}
+</Layout>
