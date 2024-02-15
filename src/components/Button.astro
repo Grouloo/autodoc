@@ -1,74 +1,92 @@
 ---
 interface Props {
-    primary?: boolean
-    flat?: boolean
-    light?: boolean
+	href?: string
+	onclick?: string
+	icon?: string
+	primary?: boolean
+	flat?: boolean
+	light?: boolean
 }
 
-const { primary, flat, light } = Astro.props
+const { href, onclick, icon, primary, flat, light } = Astro.props
 
 let classes: string[] = ['btn']
 
 if (primary) {
-    classes.push('primary')
+	classes.push('primary')
 } else {
-    classes.push('default')
+	classes.push('default')
 }
 
 if (flat) {
-    classes.push('flat')
-} else if(light) {
-    classes.push('light')
+	classes.push('flat')
+} else if (light) {
+	classes.push('light')
 } else {
-    classes.push('shadow')
+	classes.push('shadow')
 }
-
 ---
 
-<a class={classes.join(' ')}>
-    <slot />
+<a href={href} onclick={onclick} class={classes.join(' ')}>
+	{
+		icon && (
+			<div class="label-left">
+				<span class="material-symbols-outlined">{icon}</span>
+			</div>
+		)
+	}
+	<slot />
 </a>
 
 <style>
-    .btn {
-        transition-property: transform,color,background,background-color,border-color,text-decoration-color,fill,stroke,opacity;
-        transition-timing-function: ease;
-        transition-duration: .25s;
-        outline: 2px solid transparent;
-        outline-offset: 2px;
-        font-weight: 400;
-        border-radius: 10px;
-        padding-left: 15px;
-        padding-right: 15px;
-        white-space: nowrap;
-        justify-content: center;
-        align-items: center;
-        min-width: 80px;
-        height: 40px;
-        box-sizing: border-box;
-        display: inline-flex;
-        cursor: pointer;
-    }
+	.btn {
+		transition-property: transform, color, background, background-color,
+			border-color, text-decoration-color, fill, stroke, opacity;
+		transition-timing-function: ease;
+		transition-duration: 0.25s;
+		outline: 2px solid transparent;
+		outline-offset: 2px;
+		font-weight: 400;
+		border-radius: 10px;
+		padding-left: 15px;
+		padding-right: 15px;
+		white-space: nowrap;
+		justify-content: center;
+		align-items: center;
+		min-width: 80px;
+		height: 40px;
+		box-sizing: border-box;
+		display: inline-flex;
+		cursor: pointer;
+		text-decoration: none;
+	}
 
-    .btn:hover {
-        opacity: 80%;
-    }
+	.btn:hover {
+		opacity: 80%;
+	}
 
+	.label-left {
+		margin-right: 15px;
+		box-sizing: border-box;
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+	}
 
-    .default {
-        background-color: rgb(212, 212, 216);
-    }
+	.default {
+		background-color: rgb(212, 212, 216);
+	}
 
-    .default.shadow {
-        box-shadow: rgba(212, 212, 216, 0.35) 0px 5px 15px;
-    }
+	.default.shadow {
+		box-shadow: rgba(212, 212, 216, 0.35) 0px 5px 15px;
+	}
 
-    .primary {
-        background-color: rgb(1, 112, 240);
-        color: white;
-    }
-    
-    .primary.shadow {
-        box-shadow: rgba(1, 112, 240, 0.35) 0px 5px 15px;
-    }
+	.primary {
+		background-color: rgb(1, 112, 240);
+		color: white;
+	}
+
+	.primary.shadow {
+		box-shadow: rgba(1, 112, 240, 0.35) 0px 5px 15px;
+	}
 </style>

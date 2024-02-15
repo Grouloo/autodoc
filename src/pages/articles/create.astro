@@ -1,0 +1,31 @@
+---
+import Container from '@components/Container.astro'
+import Segment from '@components/Segment.astro'
+import Layout from '@layouts/Layout.astro'
+import Form from '@components/Form.astro'
+import type { ArticleCreationForm } from '@domain/articles/commands'
+import { FieldConfig, type FormDefinition } from '@components/Form'
+
+const articleCreationForm: FormDefinition<ArticleCreationForm> = {
+	title: {
+		label: 'Title',
+		config: FieldConfig.Text({}),
+	},
+}
+
+if (Astro.request.method === 'POST') {
+	const data = await Astro.request.formData()
+
+	console.log(data)
+}
+---
+
+<Layout title="New article">
+	<Container>
+		<h1>New article</h1>
+
+		<Segment>
+			<Form definition={articleCreationForm} cols={1} />
+		</Segment>
+	</Container>
+</Layout>

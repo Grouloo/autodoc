@@ -1,0 +1,97 @@
+---
+import Divider from './Divider.astro'
+import Button from './Button.astro'
+import Grid from './Grid/index.astro'
+import Cell from './Grid/Cell.astro'
+import { match } from 'shulk'
+import type { FormDefinition } from './Form'
+
+interface Props {
+	definition: FormDefinition<any>
+	cols: number
+}
+
+const { definition } = Astro.props
+---
+
+<form id="form" method="POST">
+	<Grid>
+		{
+			Object.entries(definition).map(([name, field]) => (
+				<Cell width={12}>
+					{match(field.config).case({
+						Text: () => (
+							<div class="field">
+								<label for={name}>{field.label}</label>
+
+								<input
+									type="text"
+									id={name}
+									name={name}
+									placeholder={field.label}
+								/>
+							</div>
+						),
+					})}
+				</Cell>
+			))
+		}
+	</Grid>
+
+	<Divider hidden />
+
+	<div class="form-footer">
+		<Button primary icon="send" onclick="document.forms['form'].submit();">
+			Submit
+		</Button>
+	</div>
+</form>
+
+<style>
+	form {
+		width: 100%;
+		overflow: none;
+		/* display: flex; */
+	}
+
+	.field {
+		cursor: text;
+		transition-property: background;
+		transition-timing-function: ease;
+		transition-duration: 0.15s !important;
+		outline: 2px solid transparent;
+		outline-offset: 2px;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+		padding-left: 0.75rem;
+		padding-right: 0.75rem;
+		border-radius: 10px;
+		background-color: rgb(245, 244, 245);
+	}
+
+	.field:hover {
+		background-color: rgb(228, 228, 228);
+	}
+
+	.field:focus-visible {
+		background-color: rgb(245, 244, 245) !important;
+	}
+
+	.field label {
+		--tw-text-opacity: 1;
+		font-size: small;
+	}
+
+	input {
+		width: 100%;
+		border: none;
+		outline: none;
+		background-color: inherit;
+		font-size: medium;
+	}
+
+	.form-footer {
+		text-align: right;
+		padding-right: 10px;
+	}
+</style>

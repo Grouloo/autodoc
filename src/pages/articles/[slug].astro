@@ -1,8 +1,11 @@
 ---
 import { ArticleQueries } from '@domain'
 import Card from '@components/Card.astro'
+import Container from '@components/Container.astro'
+import Segment from '@components/Segment.astro'
 import Layout from '@layouts/Layout.astro'
 import { match } from 'shulk'
+import Button from '@components/Button.astro'
 
 const { db } = Astro.locals
 
@@ -13,6 +16,8 @@ const fetchArticleResult = await ArticleQueries(db).fromSlug(slug as string)
 const title = fetchArticleResult
 	.map((article) => article.title)
 	.mapErr(() => 'Error').val
+
+fetchArticleResult.map((article) => console.log(article))
 
 fetchArticleResult.mapErr((err) => console.error(err))
 ---
@@ -28,7 +33,17 @@ fetchArticleResult.mapErr((err) => console.error(err))
 					})}
 				</Card>
 			),
-			Ok: ({ val: article }) => <p>{article.title}</p>,
+			Ok: ({ val: article }) => (
+				<Container>
+					<h1>{article.title}</h1>
+
+					<Segment>
+						<Button primary icon={'text_select_move_forward_character'}>
+							Generate
+						</Button>
+					</Segment>
+				</Container>
+			),
 		})
 	}
 </Layout>
