@@ -15,9 +15,9 @@ export async function connectPocketBase() {
 		)
 
 	const db: DB = {
-		create: async (collection: string, data: {}, id?: string) => {
+		create: async (collection: string, data: {}, _id?: string) => {
 			try {
-				const v = await pb.collection(collection).create({ ...data, id })
+				const v = await pb.collection(collection).create({ ...data })
 
 				return Ok(createReference(collection, v.id))
 			} catch (e) {

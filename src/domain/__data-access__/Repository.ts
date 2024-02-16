@@ -1,6 +1,6 @@
 import type { AsyncResult } from 'shulk'
 import type { DB } from './DB'
-import type { Select } from './Select'
+import { Select } from './Select'
 import type { NotFound, UnexpectedError } from '@domain/__abstract__'
 
 type Unpacked<T> = T extends (infer U)[] ? U : T
@@ -34,6 +34,6 @@ export function $repository<T extends object>(schema: Schema<T>) {
 		read: (id: string): AsyncResult<UnexpectedError | NotFound, T> =>
 			db.read<T>(collection, schema.primaryKey as string, id, joins),
 
-		select: (q: Select<T>) => db.query(collection, q, joins),
+		selectAll: () => Select.in<T>(db, collection, joins),
 	})
 }

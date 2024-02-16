@@ -4,19 +4,27 @@ import Segment from '@components/Segment.astro'
 import Layout from '@layouts/Layout.astro'
 import Form from '@components/Form.astro'
 import type { ArticleCreationForm } from '@domain/articles/commands'
-import { FieldConfig, type FormDefinition } from '@components/Form'
+import { FieldConfig, onSubmit, type FormDefinition } from '@components/Form'
+import { ArticleCommands } from '@domain'
+
+const { db } = Astro.locals
 
 const articleCreationForm: FormDefinition<ArticleCreationForm> = {
 	title: {
 		label: 'Title',
+		mandatory: true,
 		config: FieldConfig.Text({}),
 	},
 }
 
-if (Astro.request.method === 'POST') {
-	const data = await Astro.request.formData()
+const error = await onSubmit(Astro, articleCreationForm, async (input) => {
+	const commandResult = await ArticleCommands.create(input, db)
 
-	console.log(data)
+	return commandResult.mapErr((err) => err.message)
+})
+
+if (Astro.request.method === 'POST' && !error) {
+	return Astro.redirect('/articles/')
 }
 ---
 
@@ -25,7 +33,7 @@ if (Astro.request.method === 'POST') {
 		<h1>New article</h1>
 
 		<Segment>
-			<Form definition={articleCreationForm} cols={1} />
+			<Form definition={articleCreationForm} cols={1} {error} />
 		</Segment>
 	</Container>
 </Layout>

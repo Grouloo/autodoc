@@ -4,18 +4,28 @@ import Button from './Button.astro'
 import Grid from './Grid/index.astro'
 import Cell from './Grid/Cell.astro'
 import { match } from 'shulk'
-import type { FormDefinition } from './Form'
+import type { FormDefinition, FormError } from './Form'
+import Card from './Card.astro'
 
-interface Props {
+type Props = {
 	definition: FormDefinition<any>
 	cols: number
+	error: FormError
 }
 
-const { definition } = Astro.props
+const { definition, error } = Astro.props
 ---
 
 <form id="form" method="POST">
 	<Grid>
+		{
+			error && (
+				<>
+					<Card error>{error.message}</Card>
+					<Divider hidden />
+				</>
+			)
+		}
 		{
 			Object.entries(definition).map(([name, field]) => (
 				<Cell width={12}>
@@ -29,6 +39,7 @@ const { definition } = Astro.props
 									id={name}
 									name={name}
 									placeholder={field.label}
+									value={error?.formData.get(name)?.toString()}
 								/>
 							</div>
 						),

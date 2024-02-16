@@ -1,3 +1,7 @@
+import type { UnexpectedError } from '@domain/__abstract__'
+import type { AsyncResult } from 'shulk'
+import type { DB } from './DB'
+
 type Operator = '=' | 'in'
 
 export class Select<T> {
@@ -5,8 +9,14 @@ export class Select<T> {
 		[]
 	protected sortings: { field: string; order: 'ASC' | 'DESC' }[] = []
 
-	static from<T>() {
-		return new this<T>()
+	constructor(
+		protected db: DB,
+		protected table: string,
+		protected joins: string[],
+	) {}
+
+	static in<T>(db: DB, table: string, joins: string[]) {
+		return new this<T>(db, table, joins)
 	}
 
 	get Filters() {
@@ -38,5 +48,9 @@ export class Select<T> {
 	sortBy(field: keyof T, order: 'ASC' | 'DESC') {
 		this.sortings.push({ field: field as string, order })
 		return this
+	}
+
+	done(): AsyncResult<UnexpectedError, T[]> {
+		return this.db.query(this.table, this, this.joins)
 	}
 }

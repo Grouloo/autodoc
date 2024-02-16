@@ -1,0 +1,38 @@
+---
+import Card from '@components/Card.astro'
+import Container from '@components/Container.astro'
+import { ArticleQueries } from '@domain'
+import Layout from '@layouts/Layout.astro'
+import { match } from 'shulk'
+
+const { db } = Astro.locals
+
+const listArticlesResult = await ArticleQueries(db).listAll()
+---
+
+<Layout title="Articles">
+	<Container>
+		{
+			match(listArticlesResult).case({
+				Err: ({ val: err }) => <Card error>{err.message}</Card>,
+				Ok: ({ val: articles }) => (
+					<ul>
+						{articles.map((article) => (
+							<li>
+								<a href={'/articles/' + article.slug}>
+									<h2>{article.title}</h2>
+								</a>
+
+								<p>
+									{'description' in article
+										? article.description
+										: 'No description yet'}
+								</p>
+							</li>
+						))}
+					</ul>
+				),
+			})
+		}
+	</Container>
+</Layout>
