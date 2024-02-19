@@ -1,6 +1,10 @@
-import { NotFound, UnexpectedError } from '@domain/__abstract__/Errors'
-import { createReference } from '@domain/__abstract__/__types__/Reference'
-import type { DB, Select } from '@domain/__data-access__'
+import {
+	NotFound,
+	UnexpectedError,
+	createReference,
+	type DB,
+	type Select,
+} from '@domain'
 import PocketBase, { ClientResponseError } from 'pocketbase'
 import { Err, Ok, match, type AsyncResult } from 'shulk'
 

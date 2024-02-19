@@ -1,5 +1,5 @@
 import { ArticleRepository } from './ArticleRepository'
-import { type DB } from '@domain/__data-access__'
+import { type DB } from '../__data-access__'
 
 export function ArticleQueries(db: DB) {
 	const repository = ArticleRepository(db)

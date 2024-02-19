@@ -1,4 +1,4 @@
-import { $repository, type Schema } from '@domain/__data-access__'
+import { $repository, type Schema } from '../__data-access__'
 import type { Article, Quality, Section, Source } from './Article'
 
 const SourceSchema: Schema<Source> = {

@@ -1,8 +1,8 @@
-import type { LLM } from '@domain/__abstract__/LLM'
+import type { LLM } from '../__abstract__/LLM'
 import { Article, Section, type ArticleTag } from './Article'
 import { createArticleSlug } from './__types__/ArticleSlug'
 import type { AsyncResult } from 'shulk'
-import { UnexpectedError } from '@domain/__abstract__'
+import { UnexpectedError } from '../__abstract__'
 
 const GENERATE_DESCR_PROMPT = (title: string) =>
 	`Give me information about the topic "${title}". Your response will be formatted according to this JSON-like structure: {"description": string, "relatedTo": string[]}`

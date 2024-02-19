@@ -3,6 +3,8 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
+			"@adapters/*": ["src/__adapters__/*"],
+			"@domain": ["src/__domain__"],
 			"@*": ["src/*"]
 		}
 	},
