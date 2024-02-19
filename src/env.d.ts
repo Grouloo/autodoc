@@ -2,6 +2,9 @@
 
 declare namespace App {
 	interface Locals {
-		db: import('@domain/__abstract__').DB
+		dependencies: {
+			db: import('@domain/__data-access__').DB
+			llm: import('@domain/__abstract__').LLM
+		}
 	}
 }

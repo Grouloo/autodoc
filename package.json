@@ -12,6 +12,7 @@
   "dependencies": {
     "@astrojs/check": "^0.5.3",
     "@astrojs/tailwind": "^5.1.0",
+    "@mistralai/mistralai": "^0.0.10",
     "astro": "^4.3.6",
     "pocketbase": "^0.21.1",
     "shulk": "^0.14.0",

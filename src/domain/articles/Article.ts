@@ -6,7 +6,7 @@ type BaseSection = { title: string; content: string }
 
 export type Source = { title: string; url: string }
 
-const Section = union<{
+export const Section = union<{
 	NotSourced: BaseSection
 	Sourced: BaseSection & { sources: Source[] }
 }>()
@@ -23,7 +23,7 @@ export const Article = union<{
 		slug: ArticleSlug
 		title: string
 	}
-	Created: {
+	Generated: {
 		slug: string
 		title: string
 		description: Section
@@ -33,3 +33,4 @@ export const Article = union<{
 	}
 }>()
 export type Article = InferUnion<typeof Article>['any']
+export type ArticleTag = InferUnion<typeof Article>

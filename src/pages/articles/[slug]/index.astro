@@ -1,13 +1,11 @@
 ---
 import { ArticleQueries } from '@domain'
 import Card from '@components/Card.astro'
-import Container from '@components/Container.astro'
-import Segment from '@components/Segment.astro'
 import Layout from '@layouts/Layout.astro'
+import ShowArticle from '@components/Articles/ShowArticle.astro'
 import { match } from 'shulk'
-import Button from '@components/Button.astro'
 
-const { db } = Astro.locals
+const { db } = Astro.locals.dependencies
 
 const { slug } = Astro.params
 
@@ -33,17 +31,7 @@ fetchArticleResult.mapErr((err) => console.error(err))
 					})}
 				</Card>
 			),
-			Ok: ({ val: article }) => (
-				<Container>
-					<h1>{article.title}</h1>
-
-					<Segment>
-						<Button primary icon={'text_select_move_forward_character'}>
-							Generate
-						</Button>
-					</Segment>
-				</Container>
-			),
+			Ok: ({ val: article }) => <ShowArticle {article} />,
 		})
 	}
 </Layout>

@@ -25,6 +25,16 @@ export async function connectPocketBase() {
 			}
 		},
 
+		async update<T>(collection: string, id: string, data: T) {
+			try {
+				const v = await pb.collection(collection).update<T>(id, data as any)
+
+				return Ok(v)
+			} catch (e) {
+				return Err(new UnexpectedError((e as any).message))
+			}
+		},
+
 		read: async <T>(
 			collection: string,
 			idField: string,
@@ -40,7 +50,12 @@ export async function connectPocketBase() {
 				return Ok(data as T)
 			} catch (e) {
 				return match((e as ClientResponseError).status).case({
-					404: () => Err(new NotFound('Entity does not exist.')),
+					404: () =>
+						Err(
+							new NotFound(
+								`Entity '${collection}/${id}' does not exist.`,
+							),
+						),
 					_otherwise: () => Err(new UnexpectedError((e as any).message)),
 				})
 			}

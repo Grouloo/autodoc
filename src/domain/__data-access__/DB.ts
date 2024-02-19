@@ -9,6 +9,11 @@ export type DB = {
 		data: any,
 		id?: string,
 	) => AsyncResult<UnexpectedError, Reference>
+	update: <T>(
+		collection: string,
+		id: string,
+		data: any,
+	) => AsyncResult<UnexpectedError | NotFound, T>
 	read: <T>(
 		collection: string,
 		idField: string,

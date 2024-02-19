@@ -1,17 +1,19 @@
 ---
+import Button from '@components/Button.astro'
 import Card from '@components/Card.astro'
-import Container from '@components/Container.astro'
+import Segment from '@components/Segment.astro'
 import { ArticleQueries } from '@domain'
 import Layout from '@layouts/Layout.astro'
 import { match } from 'shulk'
 
-const { db } = Astro.locals
+const { db } = Astro.locals.dependencies
 
 const listArticlesResult = await ArticleQueries(db).listAll()
 ---
 
 <Layout title="Articles">
-	<Container>
+	<Segment>
+		<Button primary icon="add" href="/articles/create">New article</Button>
 		{
 			match(listArticlesResult).case({
 				Err: ({ val: err }) => <Card error>{err.message}</Card>,
@@ -34,5 +36,5 @@ const listArticlesResult = await ArticleQueries(db).listAll()
 				),
 			})
 		}
-	</Container>
+	</Segment>
 </Layout>

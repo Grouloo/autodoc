@@ -1,13 +1,13 @@
 ---
-import Container from '@components/Container.astro'
 import Segment from '@components/Segment.astro'
 import Layout from '@layouts/Layout.astro'
 import Form from '@components/Form.astro'
 import type { ArticleCreationForm } from '@domain/articles/commands'
 import { FieldConfig, onSubmit, type FormDefinition } from '@components/Form'
 import { ArticleCommands } from '@domain'
+import Button from '@components/Button.astro'
 
-const { db } = Astro.locals
+const { db } = Astro.locals.dependencies
 
 const articleCreationForm: FormDefinition<ArticleCreationForm> = {
 	title: {
@@ -29,11 +29,10 @@ if (Astro.request.method === 'POST' && !error) {
 ---
 
 <Layout title="New article">
-	<Container>
-		<h1>New article</h1>
+	<Button icon="arrow_left" href="/articles/">Back</Button>
+	<h1>New article</h1>
 
-		<Segment>
-			<Form definition={articleCreationForm} cols={1} {error} />
-		</Segment>
-	</Container>
+	<Segment>
+		<Form definition={articleCreationForm} cols={1} {error} />
+	</Segment>
 </Layout>

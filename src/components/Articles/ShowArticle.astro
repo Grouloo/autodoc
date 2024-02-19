@@ -1,0 +1,53 @@
+---
+import type { Article } from '@domain'
+import Segment from '../Segment.astro'
+import Button from '../Button.astro'
+import Divider from '@components/Divider.astro'
+import { match } from 'shulk'
+
+interface Props {
+	article: Article
+}
+
+const { article } = Astro.props
+---
+
+<div id="ShowArticle" x-data="{ generating: false }">
+	<h1>{article.title}</h1>
+
+	<Segment>
+		{
+			match(article).case({
+				Pending: () => (
+					<Button
+						primary
+						icon={'text_select_move_forward_character'}
+						hx-patch={'/articles/' + article.slug + '/generate'}
+						hx-target="#ShowArticle"
+						loadOnClick
+					>
+						Generate
+					</Button>
+				),
+				Generated: () => null,
+			})
+		}
+	</Segment>
+
+	<Divider hidden />
+
+	{
+		article._state === 'Generated' && (
+			<Segment>
+				<section>{article.description.content}</section>
+
+				{article.sections.map((section) => (
+					<section>
+						<h2>{section.title}</h2>
+						<p>{section.content}</p>
+					</section>
+				))}
+			</Segment>
+		)
+	}
+</div>

@@ -5,7 +5,9 @@ interface Props {
 
 const classes: string[] = ['divider']
 
-if (!Astro.props.hidden) {
+if (Astro.props.hidden) {
+	classes.push('hidden')
+} else {
 	classes.push('visible')
 }
 ---
@@ -15,7 +17,8 @@ if (!Astro.props.hidden) {
 <style>
 	.divider {
 		width: 30%;
-
+		margin-top: 20px;
+		margin-bottom: 20px;
 		margin-left: auto;
 		margin-right: auto;
 	}
@@ -24,5 +27,8 @@ if (!Astro.props.hidden) {
 		border-top-style: solid;
 		border-top-color: #303030;
 		border-top-width: 1.5px;
+	}
+
+	.hidden {
 	}
 </style>

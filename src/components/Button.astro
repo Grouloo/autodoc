@@ -1,14 +1,17 @@
 ---
 interface Props {
 	href?: string
+	'hx-patch'?: string
+	'hx-target'?: string
 	onclick?: string
+	loadOnClick?: boolean
 	icon?: string
 	primary?: boolean
 	flat?: boolean
 	light?: boolean
 }
 
-const { href, onclick, icon, primary, flat, light } = Astro.props
+const { href, onclick, loadOnClick, icon, primary, flat, light } = Astro.props
 
 let classes: string[] = ['btn']
 
@@ -27,11 +30,23 @@ if (flat) {
 }
 ---
 
-<a href={href} onclick={onclick} class={classes.join(' ')}>
+<a
+	href={href}
+	onclick={onclick}
+	class={classes.join(' ')}
+	hx-patch={Astro.props['hx-patch']}
+	hx-target={Astro.props['hx-target']}
+	x-data={`{ loading: false, icon: '${icon || ''}' }`}
+	@click={loadOnClick && 'loading = true; '}
+	x-bind:class="loading ? 'is-loading' : ''"
+>
 	{
 		icon && (
 			<div class="label-left">
-				<span class="material-symbols-outlined">{icon}</span>
+				<span
+					class="material-symbols-outlined"
+					x-html="loading ? 'hourglass_empty' : icon"
+				/>
 			</div>
 		)
 	}
@@ -73,8 +88,14 @@ if (flat) {
 		align-items: center;
 	}
 
+	.is-loading {
+		opacity: 60% !important;
+		cursor: wait;
+	}
+
 	.default {
 		background-color: rgb(212, 212, 216);
+		color: black;
 	}
 
 	.default.shadow {
