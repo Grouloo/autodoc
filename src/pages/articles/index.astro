@@ -9,6 +9,8 @@ import { match } from 'shulk'
 const { db } = Astro.locals.dependencies
 
 const listArticlesResult = await ArticleQueries(db).listAll()
+
+listArticlesResult.map((i) => console.log(i))
 ---
 
 <Layout title="Articles">
@@ -27,7 +29,7 @@ const listArticlesResult = await ArticleQueries(db).listAll()
 
 								<p>
 									{'description' in article
-										? article.description
+										? article.description.content
 										: 'No description yet'}
 								</p>
 							</li>

@@ -1,4 +1,4 @@
-import type { UnexpectedError } from '@domain/__abstract__'
+import type { UnexpectedError } from '../__abstract__'
 import type { AsyncResult } from 'shulk'
 import type { DB } from './DB'
 
@@ -50,7 +50,7 @@ export class Select<T> {
 		return this
 	}
 
-	done(): AsyncResult<UnexpectedError, T[]> {
+	exec(): AsyncResult<UnexpectedError, T[]> {
 		return this.db.query(this.table, this, this.joins)
 	}
 }

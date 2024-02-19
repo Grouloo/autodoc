@@ -2,8 +2,7 @@
 import ShowArticle from '@components/Articles/ShowArticle.astro'
 import Card from '@components/Card.astro'
 import { ArticleCommands } from '@domain'
-import type { Article } from '@domain/articles/Article'
-import { createArticleSlug } from '@domain/articles/__types__/ArticleSlug'
+import type { Article } from '@domain'
 import { Err, match, type Result } from 'shulk'
 
 const { slug } = Astro.params
@@ -11,10 +10,8 @@ const { slug } = Astro.params
 let articleOrError: Result<string, Article>
 
 if (Astro.request.method === 'PATCH' && slug) {
-	const articleSlug = createArticleSlug(slug)
-
 	const generateArticleResult = await ArticleCommands.generate(
-		articleSlug,
+		slug,
 		Astro.locals.dependencies,
 	)
 

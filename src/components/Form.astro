@@ -52,7 +52,12 @@ const { definition, error } = Astro.props
 	<Divider hidden />
 
 	<div class="form-footer">
-		<Button primary icon="send" onclick="document.forms['form'].submit();">
+		<Button
+			primary
+			icon="send"
+			onclick="document.forms['form'].submit();"
+			loadOnClick
+		>
 			Submit
 		</Button>
 	</div>

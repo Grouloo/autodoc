@@ -1,5 +1,5 @@
-import type { UnexpectedError } from '@domain/__abstract__'
-import type { LLM } from '@domain/__abstract__/LLM'
+import type { UnexpectedError } from '@domain'
+import type { LLM } from '@domain'
 import MistralClient from '@mistralai/mistralai'
 import { Err, Ok } from 'shulk'
 

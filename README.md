@@ -21,3 +21,4 @@ It's the... BTASHAP stack? Let's just say it's the _bestest_ stack.
 -  HTMX (Client-to-backend communication)
 -  Alpine (Client-side reactivity)
 -  PocketBase (Database)
+-  Mistral (Large Language Model)

@@ -44,6 +44,7 @@ export const ArticleRepository = $repository<Article>({
 			table: 'articles',
 			primaryKey: 'slug',
 			relations: {
+				_state: false,
 				slug: false,
 				title: false,
 			},

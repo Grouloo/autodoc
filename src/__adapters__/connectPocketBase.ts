@@ -51,6 +51,12 @@ export async function connectPocketBase() {
 					.getFirstListItem(`${idField}="${id}"`, {
 						expand: joins.join(','),
 					})
+
+				if (data.expand) {
+					Object.entries(data.expand).map(([field, val]) => {
+						data[field] = val
+					})
+				}
 				return Ok(data as T)
 			} catch (e) {
 				return match((e as ClientResponseError).status).case({
@@ -88,6 +94,14 @@ export async function connectPocketBase() {
 					filters: parsedFilters,
 					expand: joins.join(','),
 				})
+
+				for (let item of data) {
+					if (item.expand) {
+						Object.entries(item.expand).map(([field, val]) => {
+							item[field] = val
+						})
+					}
+				}
 
 				return Ok(data as T[])
 			} catch (e) {

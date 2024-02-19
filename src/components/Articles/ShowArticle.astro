@@ -29,7 +29,17 @@ const { article } = Astro.props
 						Generate
 					</Button>
 				),
-				Generated: () => null,
+				Generated: () => (
+					<Button
+						primary
+						icon={'add'}
+						hx-patch={'/articles/' + article.slug + '/generate'}
+						hx-target="#ShowArticle"
+						loadOnClick
+					>
+						Add a section
+					</Button>
+				),
 			})
 		}
 	</Segment>
@@ -46,6 +56,12 @@ const { article } = Astro.props
 						<h2>{section.title}</h2>
 						<p>{section.content}</p>
 					</section>
+				))}
+
+				<h2>Related to</h2>
+
+				{article.relatedTo.map((art) => (
+					<Button href={'/articles/' + art.slug}>{art.title}</Button>
 				))}
 			</Segment>
 		)

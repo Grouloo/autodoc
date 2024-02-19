@@ -1,4 +1,4 @@
-import type { Percentage } from '@domain/__abstract__/__types__'
+import type { Percentage } from '../__abstract__'
 import { union, type InferUnion } from 'shulk'
 import type { ArticleSlug } from './__types__/ArticleSlug'
 
@@ -28,7 +28,7 @@ export const Article = union<{
 		title: string
 		description: Section
 		sections: Section[]
-		relatedTo: { slug: ArticleSlug; title: string }[]
+		relatedTo: { _state: 'Pending'; slug: ArticleSlug; title: string }[]
 		quality: Quality
 	}
 }>()

@@ -7,6 +7,6 @@ export function ArticleQueries(db: DB) {
 	return {
 		fromSlug: (slug: string) => repository.read(slug),
 
-		listAll: () => repository.selectAll().done(),
+		listAll: () => repository.selectAll().exec(),
 	}
 }

@@ -39,10 +39,12 @@ export function ArticleGPT(llm: LLM) {
 							content: response.description,
 						}),
 						sections: [],
-						relatedTo: response.relatedTo.map((title) => ({
-							slug: createArticleSlug(title),
-							title,
-						})),
+						relatedTo: response.relatedTo.map((title) =>
+							Article.Pending({
+								slug: createArticleSlug(title),
+								title,
+							}),
+						),
 						quality: {
 							sourcedSections: 0,
 							totalSections: 1,

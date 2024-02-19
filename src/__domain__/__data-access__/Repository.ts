@@ -1,9 +1,8 @@
-import { Err, Ok, type AsyncResult } from 'shulk'
+import { Err, type AsyncResult } from 'shulk'
 import type { DB } from './DB'
 import { Select } from './Select'
-import type { NotFound, UnexpectedError } from '@domain/__abstract__'
-import type { Reference } from '@domain/__abstract__/__types__/Reference'
-import { log } from 'node_modules/astro/dist/core/logger/core'
+import type { NotFound, UnexpectedError } from '@domain'
+import type { Reference } from '@domain'
 
 type Unpacked<T> = T extends (infer U)[] ? U : T
 
@@ -20,9 +19,9 @@ export type Schema<T> = {
 export function $repository<T extends object>(schema: Schema<T>) {
 	const collection = schema.table
 
-	const joins = Object.values(schema.relations).filter(
-		(pred) => pred !== false,
-	) as string[]
+	const joins = Object.entries(schema.relations)
+		.filter((entry): entry is [string, Schema<any>] => entry[1] !== false)
+		.map(([field]) => field)
 
 	return (db: DB) => ({
 		insert: async (data: T): AsyncResult<UnexpectedError, Reference> => {
@@ -69,8 +68,12 @@ export function $repository<T extends object>(schema: Schema<T>) {
 
 					const value = data[prop as keyof T]
 
-					if (typeof value === 'object' && value && 'id' in value) {
-						const propIdResult = await propRepo.update(value as any)
+					if (
+						typeof value === 'object' &&
+						value &&
+						!Array.isArray(value)
+					) {
+						const propIdResult = await propRepo.upsert(value)
 
 						if (propIdResult._state === 'Err') {
 							return Err(propIdResult.val)
@@ -78,14 +81,21 @@ export function $repository<T extends object>(schema: Schema<T>) {
 
 						// @ts-expect-error
 						normalForm[prop] = propIdResult.val.id
-					} else if (value) {
-						const propIdResult = await propRepo.insert(value)
+					} else if (Array.isArray(value)) {
+						let IDs: string[] = []
 
-						if (propIdResult._state === 'Err') {
-							return Err(propIdResult.val)
+						for (let entry of value) {
+							const propIdResult = await propRepo.upsert(entry)
+
+							if (propIdResult._state === 'Err') {
+								return Err(propIdResult.val)
+							}
+
+							// @ts-expect-error
+							IDs.push(propIdResult.val.id)
 						}
 
-						normalForm[prop] = propIdResult.val.id
+						normalForm[prop] = IDs
 					}
 				} else {
 					normalForm[prop] = data[prop as keyof T]
@@ -95,53 +105,18 @@ export function $repository<T extends object>(schema: Schema<T>) {
 			return db.update<T>(collection, (data as any).id, normalForm)
 		},
 
-		read: async (id: string): AsyncResult<UnexpectedError | NotFound, T> => {
-			const readResult = await db.read<T>(
-				collection,
-				schema.primaryKey as string,
-				id,
-				joins,
-			)
+		upsert: (data: T) => {
+			const repo = $repository(schema)(db)
 
-			if (readResult._state === 'Err') {
-				return readResult
+			if ('id' in data) {
+				return repo.update(data)
+			} else {
+				return repo.insert(data)
 			}
-
-			const normalForm = readResult.val
-
-			console.log(normalForm)
-
-			// @ts-expect-error
-			const denormalized: T = {}
-
-			for (let [prop, propScheme] of Object.entries(schema.relations)) {
-				if (
-					propScheme !== false &&
-					normalForm[prop as keyof T] &&
-					!Array.isArray(normalForm[prop as keyof T])
-				) {
-					// @ts-expect-error
-					const propRepo = $repository(propScheme as Schema<T[keyof T]>)(
-						db,
-					)
-
-					const propIdResult = await propRepo.read(
-						normalForm[prop as keyof T] as any,
-					)
-
-					if (propIdResult._state === 'Err') {
-						return Err(propIdResult.val)
-					}
-
-					// @ts-expect-error
-					denormalized[prop as keyof T] = propIdResult.val
-				} else {
-					denormalized[prop as keyof T] = normalForm[prop as keyof T]
-				}
-			}
-
-			return Ok(denormalized)
 		},
+
+		read: async (id: string): AsyncResult<UnexpectedError | NotFound, T> =>
+			db.read<T>(collection, schema.primaryKey as string, id, joins),
 
 		selectAll: () => Select.in<T>(db, collection, joins),
 	})

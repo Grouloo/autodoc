@@ -1,4 +1,4 @@
-import type { DB } from '@domain/__data-access__'
+import type { DB } from '../../__data-access__'
 import { Article } from '../Article'
 import { ArticleRepository } from '../ArticleRepository'
 import { createArticleSlug } from '../__types__/ArticleSlug'

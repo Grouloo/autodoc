@@ -1,12 +1,12 @@
-import type { DB } from '@domain/__data-access__'
+import type { DB } from '../../__data-access__'
 import type { ArticleSlug } from '../__types__/ArticleSlug'
 import { ArticleQueries } from '../ArticleQueries'
 import type { Article, ArticleTag } from '../Article'
-import type { LLM } from '@domain/__abstract__/LLM'
+import type { LLM } from '../../__abstract__/LLM'
 import { ArticleGPT } from '../ArticleGPT'
 import { ArticleRepository } from '../ArticleRepository'
 import type { AsyncResult } from 'shulk'
-import type { NotFound, UnexpectedError } from '@domain/__abstract__'
+import type { NotFound, UnexpectedError } from '../../__abstract__'
 
 type Dependencies = {
 	db: DB
@@ -21,15 +21,15 @@ export async function generate(
 
 	const readArticleResult = await ArticleQueries(db).fromSlug(slug)
 
-	const generatedArticleResult = await readArticleResult
+	const generateArticleResult = await readArticleResult
 		.filterType(articleIsPending, AlreadyGenerated.new)
 		.flatMapAsync(ArticleGPT(llm).generate)
 
-	const updateArticleResult = generatedArticleResult.flatMapAsync(
+	const updateArticleResult = await generateArticleResult.flatMapAsync(
 		ArticleRepository(db).update,
 	)
 
-	return updateArticleResult
+	return updateArticleResult.flatMap(() => generateArticleResult)
 }
 
 const articleIsPending = (article: Article): article is ArticleTag['Pending'] =>
