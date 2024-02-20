@@ -1,7 +1,11 @@
 import { Err, type AsyncResult } from 'shulk'
 import type { DB } from './DB'
 import { Select } from './Select'
-import type { NotFound, UnexpectedError } from '@domain'
+import {
+	AlreadyPersisted,
+	NotFound,
+	type UnexpectedError,
+} from '../__abstract__/Errors'
 import type { Reference } from '@domain'
 
 type Unpacked<T> = T extends (infer U)[] ? U : T
@@ -24,11 +28,18 @@ export function $repository<T extends object>(schema: Schema<T>) {
 		.map(([field]) => field)
 
 	return (db: DB) => ({
-		insert: async (data: T): AsyncResult<UnexpectedError, Reference> => {
-			const id =
-				schema.primaryKey in data
-					? (data[schema.primaryKey as keyof T] as string)
-					: undefined
+		insert: async (
+			data: T,
+		): AsyncResult<UnexpectedError | AlreadyPersisted, Reference> => {
+			const repo = $repository(schema)(db)
+
+			const id = data[schema.primaryKey as keyof T] as string
+
+			const okIfEntityIsPersisted = await repo.read(id)
+
+			if (okIfEntityIsPersisted._state === 'Ok') {
+				return Err(new AlreadyPersisted())
+			}
 
 			const normalForm: Record<string, any> = {}
 
@@ -105,13 +116,19 @@ export function $repository<T extends object>(schema: Schema<T>) {
 			return db.update<T>(collection, (data as any).id, normalForm)
 		},
 
-		upsert: (data: T) => {
+		upsert: async (data: T) => {
 			const repo = $repository(schema)(db)
 
-			if ('id' in data) {
+			const tryInsertingResult = await repo.insert(data)
+
+			const entityAlreadyExists =
+				tryInsertingResult._state === 'Err' &&
+				tryInsertingResult.val instanceof AlreadyPersisted
+
+			if (entityAlreadyExists) {
 				return repo.update(data)
 			} else {
-				return repo.insert(data)
+				return tryInsertingResult
 			}
 		},
 

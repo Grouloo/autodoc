@@ -4,7 +4,7 @@ import Layout from '@layouts/Layout.astro'
 import Form from '@components/Form.astro'
 import type { ArticleCreationForm } from '@domain/articles/commands'
 import { FieldConfig, onSubmit, type FormDefinition } from '@components/Form'
-import { ArticleCommands } from '@domain'
+import { AlreadyPersisted, ArticleCommands } from '@domain'
 import Button from '@components/Button.astro'
 
 const { db } = Astro.locals.dependencies
@@ -20,7 +20,11 @@ const articleCreationForm: FormDefinition<ArticleCreationForm> = {
 const error = await onSubmit(Astro, articleCreationForm, async (input) => {
 	const commandResult = await ArticleCommands.create(input, db)
 
-	return commandResult.mapErr((err) => err.message)
+	return commandResult.mapErr((err) =>
+		err instanceof AlreadyPersisted
+			? 'This article already exists.'
+			: err.message,
+	)
 })
 
 if (Astro.request.method === 'POST' && !error) {

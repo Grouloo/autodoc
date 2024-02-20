@@ -9,3 +9,9 @@ export class Forbidden extends Error {}
 export class NotFound extends Error {}
 
 export class Gone extends Error {}
+
+export class AlreadyPersisted extends Error {
+	static new() {
+		return new AlreadyPersisted()
+	}
+}
