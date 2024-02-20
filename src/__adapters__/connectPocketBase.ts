@@ -89,9 +89,17 @@ export async function connectPocketBase() {
 				)
 				.join(' && ')
 
+			const parsedSortings = query.Sortings.map(({ field, order }) => ({
+				field,
+				order: order === 'ASC' ? '+' : '-',
+			}))
+				.map(({ field, order }) => `${order}${field}`)
+				.join(',')
+
 			try {
 				const data = await pb.collection(collection).getFullList({
 					filters: parsedFilters,
+					sort: parsedSortings,
 					expand: joins.join(','),
 				})
 
