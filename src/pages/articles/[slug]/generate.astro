@@ -15,6 +15,7 @@ if (Astro.request.method === 'PATCH' && slug) {
 		Astro.locals.dependencies,
 	)
 
+	generateArticleResult.mapErr(console.error)
 	articleOrError = generateArticleResult.mapErr((err) => err.constructor.name)
 } else {
 	articleOrError = Err('Wrong HTTP method.')
@@ -27,3 +28,4 @@ if (Astro.request.method === 'PATCH' && slug) {
 		Ok: ({ val: article }) => <ShowArticle {article} />,
 	})
 }
+‡

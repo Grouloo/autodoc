@@ -12,7 +12,7 @@ const { db } = Astro.locals.dependencies
 const articleCreationForm: FormDefinition<ArticleCreationForm> = {
 	title: {
 		label: 'Title',
-		mandatory: true,
+		required: true,
 		config: FieldConfig.Text({}),
 	},
 }

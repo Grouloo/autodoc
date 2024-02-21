@@ -1,0 +1,34 @@
+---
+import { addSectionForm } from '@components/Articles/AddSectionForm'
+import AddSectionForm from '@components/Articles/AddSectionForm.astro'
+import Card from '@components/Card.astro'
+import { onSubmit } from '@components/Form'
+import { ArticleCommands } from '@domain'
+
+const { slug } = Astro.params
+const { dependencies } = Astro.locals
+
+const formError = await onSubmit(Astro, addSectionForm, async (input) => {
+	const addSectionResult = await ArticleCommands.addSection(
+		slug as string,
+		input,
+		dependencies,
+	)
+	addSectionResult.mapErr(console.error)
+	return addSectionResult.mapErr((err) => err.message)
+})
+
+// if (Astro.request.method === 'POST' && !formError) {
+// 	return Astro.redirect('/articles/' + slug)
+// }
+---
+
+{
+	Astro.request.method === 'POST' && !formError && (
+		<script>window.location.reload()</script>
+	)
+}
+
+{formError && <Card error>{formError.message}</Card>}
+
+<AddSectionForm articleSlug={slug as string} />

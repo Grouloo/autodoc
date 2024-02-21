@@ -1,22 +1,25 @@
+import { isURL } from '@domain'
 import type { AstroGlobal } from 'astro'
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js'
 import { Err, Ok, match, union, type AsyncResult, type InferUnion } from 'shulk'
 
 export const FieldConfig = union<{
 	Text: {}
+	URL: {}
 }>()
 export type FieldConfig = InferUnion<typeof FieldConfig>
 
 export type FormDefinition<T> = {
 	[x in keyof T]: {
 		label: string
-		mandatory: T[x] extends undefined ? false : true
-		config: FieldConfig['Text']
+		required: T[x] extends undefined ? false : true
+		placeholder?: string
+		config: FieldConfig['Text' | 'URL']
 	}
 }
 
 type FieldDef = {
-	mandatory: boolean
+	required: boolean
 	config: FieldConfig['any']
 }
 
@@ -45,7 +48,7 @@ export async function onSubmit<T>(
 			.map(([name, field]) => {
 				const value = formData.get(name)
 
-				if (value === null && !field.mandatory) {
+				if (value === null && !field.required) {
 					return Ok([name, undefined] as const)
 				}
 
@@ -57,6 +60,16 @@ export async function onSubmit<T>(
 						} else {
 							return Err(
 								`Property "${name}" should be a string. Received "${value}".`,
+							)
+						}
+					},
+					URL: () => {
+						if (isURL(value)) {
+							const sanitized = value
+							return Ok([name, sanitized] as const)
+						} else {
+							return Err(
+								`Property "${name}" should be a valid URL. Received "${value}".`,
 							)
 						}
 					},

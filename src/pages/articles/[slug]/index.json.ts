@@ -25,6 +25,10 @@ export const GET: APIRoute = async (Astro) => {
 				Generated: (article) => ({
 					title: article.title,
 					description: article.description.content,
+					sections: article.sections.map((sec) => ({
+						title: sec.title,
+						content: sec.content,
+					})),
 					relatedTo: article.relatedTo.map((a) => ({
 						title: a.title,
 						slug: a.slug,

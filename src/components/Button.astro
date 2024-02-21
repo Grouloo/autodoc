@@ -1,8 +1,10 @@
 ---
 interface Props {
 	href?: string
+	'hx-get'?: string
 	'hx-patch'?: string
 	'hx-target'?: string
+	'x-on:click'?: string
 	onclick?: string
 	loadOnClick?: boolean
 	icon?: string
@@ -11,7 +13,7 @@ interface Props {
 	light?: boolean
 }
 
-const { href, onclick, loadOnClick, icon, primary, flat, light } = Astro.props
+const { onclick, loadOnClick, icon, primary, flat, light } = Astro.props
 
 let classes: string[] = ['btn']
 
@@ -30,15 +32,16 @@ if (flat) {
 }
 ---
 
-<a
-	href={href}
+<button
 	onclick={onclick}
 	class={classes.join(' ')}
+	hx-get={Astro.props['hx-get']}
 	hx-patch={Astro.props['hx-patch']}
 	hx-target={Astro.props['hx-target']}
 	x-data={`{ loading: false, icon: '${icon || ''}' }`}
 	@click={loadOnClick && 'loading = true; '}
 	x-bind:class="loading ? 'is-loading' : ''"
+	x-on:click={Astro.props['x-on:click']}
 >
 	{
 		icon && (
@@ -51,10 +54,14 @@ if (flat) {
 		)
 	}
 	<slot />
-</a>
+</button>
 
 <style>
 	.btn {
+		font-family: system-ui, sans-serif;
+		font-size: medium;
+		text-decoration: none;
+		border: none;
 		transition-property: transform, color, background, background-color,
 			border-color, text-decoration-color, fill, stroke, opacity;
 		transition-timing-function: ease;

@@ -1,0 +1,64 @@
+---
+interface Props {
+	title: string
+	open: string
+}
+
+const { title, open } = Astro.props
+
+//x-on:click={`${open} = false`}
+---
+
+<div x-bind:class={`${open} ? "" : "hidden"`}>
+	<div aria-hidden="true" class="layer">
+		<section class="modal">
+			<h2>{title}</h2>
+			<slot />
+		</section>
+	</div>
+</div>
+
+<style>
+	.hidden {
+		display: none;
+	}
+
+	.layer {
+		background-color: rgba(0, 0, 0, 0.5);
+		position: fixed;
+		inset: 0px;
+		overflow: auto;
+		box-sizing: border-box;
+		display: block;
+		z-index: 9998;
+	}
+
+	.modal {
+		background-color: rgb(255, 255, 255);
+		color: #11181c;
+		margin-left: auto;
+		margin-right: auto;
+		vertical-align: middle;
+		margin-top: 100px;
+		padding: 10px;
+		opacity: 1 !important;
+		max-height: calc(100vh - 200px);
+		max-width: 600px;
+		vertical-align: middle;
+		overflow: hidden;
+		max-height: inherit;
+		display: flex;
+		outline: none;
+		flex-direction: column;
+		position: relative;
+		box-sizing: border-box;
+		border-radius: 15px;
+		animation-fill-mode: forwards;
+		z-index: 9999;
+	}
+
+	.modal h2 {
+		text-align: center;
+		margin-top: 0;
+	}
+</style>

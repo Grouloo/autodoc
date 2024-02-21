@@ -38,7 +38,8 @@ export function $repository<T extends object>(schema: Schema<T>) {
 			const okIfEntityIsPersisted = await repo.read(id)
 
 			if (okIfEntityIsPersisted._state === 'Ok') {
-				return Err(new AlreadyPersisted())
+				// @ts-expect-error
+				return Err(new AlreadyPersisted(okIfEntityIsPersisted.val.id))
 			}
 
 			const normalForm: Record<string, any> = {}
@@ -126,7 +127,8 @@ export function $repository<T extends object>(schema: Schema<T>) {
 				tryInsertingResult.val instanceof AlreadyPersisted
 
 			if (entityAlreadyExists) {
-				return repo.update(data)
+				// @ts-expect-error
+				return repo.update({ ...data, id: tryInsertingResult.val.Id })
 			} else {
 				return tryInsertingResult
 			}

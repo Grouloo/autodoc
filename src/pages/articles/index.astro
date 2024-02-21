@@ -10,7 +10,7 @@ const { db } = Astro.locals.dependencies
 
 const listArticlesResult = await ArticleQueries(db).listAll()
 
-listArticlesResult.map((i) => console.log(i))
+// listArticlesResult.map((i) => console.log(i))
 ---
 
 <Layout title="Articles">

@@ -4,19 +4,31 @@ import Button from './Button.astro'
 import Grid from './Grid/index.astro'
 import Cell from './Grid/Cell.astro'
 import { match } from 'shulk'
-import type { FormDefinition, FormError } from './Form'
+import type { FieldConfig, FormError } from './Form'
 import Card from './Card.astro'
 
 type Props = {
-	definition: FormDefinition<any>
+	definition: {
+		[x: string]: {
+			required: boolean
+			label: string
+			placeholder?: string
+			config: FieldConfig['any']
+		}
+	}
 	cols: number
 	error: FormError
+	'hx-post'?: string
 }
 
 const { definition, error } = Astro.props
 ---
 
-<form id="form" method="POST">
+<form
+	id="form"
+	method={!Astro.props['hx-post'] ? 'POST' : undefined}
+	hx-post={Astro.props['hx-post']}
+>
 	<Grid>
 		{
 			error && (
@@ -38,12 +50,28 @@ const { definition, error } = Astro.props
 									type="text"
 									id={name}
 									name={name}
-									placeholder={field.label}
+									required={field.required}
+									placeholder={field.placeholder || field.label}
+									value={error?.formData.get(name)?.toString()}
+								/>
+							</div>
+						),
+						URL: () => (
+							<div class="field">
+								<label for={name}>{field.label}</label>
+
+								<input
+									type="url"
+									id={name}
+									name={name}
+									required={field.required}
+									placeholder={field.placeholder || field.label}
 									value={error?.formData.get(name)?.toString()}
 								/>
 							</div>
 						),
 					})}
+					<Divider hidden />
 				</Cell>
 			))
 		}
@@ -52,14 +80,7 @@ const { definition, error } = Astro.props
 	<Divider hidden />
 
 	<div class="form-footer">
-		<Button
-			primary
-			icon="send"
-			onclick="document.forms['form'].submit();"
-			loadOnClick
-		>
-			Submit
-		</Button>
+		<Button primary icon="send" loadOnClick> Submit </Button>
 	</div>
 </form>
 

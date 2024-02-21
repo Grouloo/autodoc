@@ -13,5 +13,13 @@ export function mockLLM(): LLM {
 				return Err(e as UnexpectedError)
 			}
 		},
+
+		addDocument: () => {
+			throw Error()
+		},
+
+		query: (_msg) => {
+			throw Error()
+		},
 	}
 }

@@ -2,9 +2,10 @@
 import type { Article } from '@domain'
 import Segment from '../Segment.astro'
 import Button from '../Button.astro'
+import Modal from '../Modal.astro'
 import Divider from '@components/Divider.astro'
 import { match } from 'shulk'
-
+import AddSectionForm from './AddSectionForm.astro'
 interface Props {
 	article: Article
 }
@@ -12,7 +13,7 @@ interface Props {
 const { article } = Astro.props
 ---
 
-<div id="ShowArticle" x-data="{ generating: false }">
+<div id="ShowArticle" x-data="{ generating: false, isAddSectionOpen: false }">
 	<h1>{article.title}</h1>
 
 	<Segment>
@@ -33,9 +34,7 @@ const { article } = Astro.props
 					<Button
 						primary
 						icon={'add'}
-						hx-patch={'/articles/' + article.slug + '/generate'}
-						hx-target="#ShowArticle"
-						loadOnClick
+						x-on:click="isAddSectionOpen = true"
 					>
 						Add a section
 					</Button>
@@ -43,6 +42,10 @@ const { article } = Astro.props
 			})
 		}
 	</Segment>
+
+	<Modal title="Add a section" open="isAddSectionOpen">
+		<AddSectionForm articleSlug={article.slug} />
+	</Modal>
 
 	<Divider hidden />
 
@@ -54,14 +57,20 @@ const { article } = Astro.props
 				{article.sections.map((section) => (
 					<section>
 						<h2>{section.title}</h2>
-						<p>{section.content}</p>
+						<p>
+							{section.content.split('\n').map((part) => (
+								<p>{part}</p>
+							))}
+						</p>
 					</section>
 				))}
 
 				<h2>Related to</h2>
 
 				{article.relatedTo.map((art) => (
-					<Button href={'/articles/' + art.slug}>{art.title}</Button>
+					<a href={'/articles/' + art.slug} style="text-decoration: none;">
+						<Button>{art.title}</Button>
+					</a>
 				))}
 			</Segment>
 		)

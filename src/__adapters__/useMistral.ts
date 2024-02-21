@@ -1,12 +1,36 @@
-import type { UnexpectedError } from '@domain'
+import { UnexpectedError } from '@domain'
 import type { LLM } from '@domain'
 import MistralClient from '@mistralai/mistralai'
+import {
+	VectorStoreIndex,
+	Document,
+	serviceContextFromDefaults,
+	MistralAIEmbedding,
+	MistralAIEmbeddingModelType,
+	MistralAI,
+} from 'llamaindex'
 import { Err, Ok } from 'shulk'
 
-export function useMistral(): LLM {
+export async function useMistral(): Promise<LLM> {
 	const apiKey = import.meta.env.SECRET_MISTRAL_API_KEY
 
 	const client = new MistralClient(apiKey)
+
+	const embedModel = new MistralAIEmbedding({
+		model: MistralAIEmbeddingModelType.MISTRAL_EMBED,
+		apiKey: apiKey,
+	})
+
+	const service = serviceContextFromDefaults({
+		chunkSize: 1024,
+		// @ts-expect-error
+		llm: new MistralAI({ apiKey: apiKey, model: 'mistral-small' }),
+		embedModel: embedModel,
+	})
+
+	const vectorStoreIndex = await VectorStoreIndex.fromDocuments([], {
+		serviceContext: service,
+	})
 
 	return {
 		prompt: async (msg: string) => {
@@ -25,6 +49,27 @@ export function useMistral(): LLM {
 				}
 			} catch (e) {
 				return Err(e as UnexpectedError)
+			}
+		},
+
+		addDocument: async (doc: string) => {
+			const document = new Document({ text: doc })
+
+			await vectorStoreIndex.insert(document)
+			return {}
+		},
+
+		query: async (msg: string) => {
+			try {
+				const queryEngine = vectorStoreIndex.asQueryEngine()
+
+				const response = await queryEngine.query({
+					query: msg,
+				})
+
+				return Ok(response.response)
+			} catch (e) {
+				return Err(new UnexpectedError((e as Error).message))
 			}
 		},
 	}
