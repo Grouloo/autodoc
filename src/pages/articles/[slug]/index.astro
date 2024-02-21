@@ -4,6 +4,8 @@ import Card from '@components/Card.astro'
 import Layout from '@layouts/Layout.astro'
 import ShowArticle from '@components/Articles/ShowArticle.astro'
 import { match } from 'shulk'
+import Button from '@components/Button.astro'
+import Divider from '@components/Divider.astro'
 
 const { db } = Astro.locals.dependencies
 
@@ -18,19 +20,32 @@ const title = fetchArticleResult
 fetchArticleResult.map((article) => console.log(article))
 
 fetchArticleResult.mapErr((err) => console.error(err))
+
+const titleFromSlug = slug
+	? slug.charAt(0).toUpperCase() + slug.slice(1).replaceAll('-', ' ')
+	: ''
 ---
 
 <Layout title={title}>
 	{
 		match(fetchArticleResult).case({
-			Err: ({ val: err }) => (
-				<Card error>
-					{match(err.constructor.name).case({
-						NotFound: () => 'Article not found.',
-						_otherwise: () => 'An unexpected error has occured.',
-					})}
-				</Card>
-			),
+			Err: ({ val: err }) =>
+				match(err.constructor.name).case({
+					NotFound: () => (
+						<div style="text-align: center;">
+							This article does not exist yet. Do you wish to create it?
+							<Divider hidden />
+							<a href={'/articles/create?title=' + titleFromSlug}>
+								<Button primary icon="add">
+									Create
+								</Button>
+							</a>
+						</div>
+					),
+					_otherwise: () => (
+						<Card error>An unexpected error has occured.</Card>
+					),
+				}),
 			Ok: ({ val: article }) => <ShowArticle {article} />,
 		})
 	}

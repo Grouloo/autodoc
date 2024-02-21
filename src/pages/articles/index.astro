@@ -15,7 +15,9 @@ const listArticlesResult = await ArticleQueries(db).listAll()
 
 <Layout title="Articles">
 	<Segment>
-		<Button primary icon="add" href="/articles/create">New article</Button>
+		<a href="/articles/create"
+			><Button primary icon="add">New article</Button>
+		</a>
 		{
 			match(listArticlesResult).case({
 				Err: ({ val: err }) => <Card error>{err.message}</Card>,

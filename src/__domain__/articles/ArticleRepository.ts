@@ -41,10 +41,9 @@ export const ArticleRepository = $repository<Article>({
 		description: SectionSchema,
 		sections: SectionSchema,
 		relatedTo: {
-			table: 'articles',
+			table: 'articles_relations',
 			primaryKey: 'slug',
 			relations: {
-				_state: false,
 				slug: false,
 				title: false,
 			},

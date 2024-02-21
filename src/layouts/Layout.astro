@@ -1,5 +1,6 @@
 ---
 import Container from '@components/Container.astro'
+import Divider from '@components/Divider.astro'
 import Navbar from '@components/Navbar.astro'
 
 interface Props {
@@ -36,6 +37,8 @@ const { title } = Astro.props
 	</head>
 	<body>
 		<Navbar />
+
+		<Divider hidden />
 
 		<Container><slot /></Container>
 	</body>

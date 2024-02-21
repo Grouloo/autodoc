@@ -8,6 +8,22 @@ import {
 import PocketBase, { ClientResponseError } from 'pocketbase'
 import { Err, Ok, match, type AsyncResult } from 'shulk'
 
+function expandRelation(data: any) {
+	if (data.expand) {
+		Object.entries(data.expand).map(([field, val]) => {
+			if (Array.isArray(val)) {
+				data[field] = val.map((v) => expandRelation(v))
+			} else if (typeof val === 'object' && val !== null) {
+				data[field] = expandRelation(val)
+			} else {
+				data[field] = val
+			}
+		})
+	}
+
+	return data
+}
+
 export async function connectPocketBase() {
 	const pb = new PocketBase('http://127.0.0.1:8090')
 
@@ -52,12 +68,9 @@ export async function connectPocketBase() {
 						expand: joins.join(','),
 					})
 
-				if (data.expand) {
-					Object.entries(data.expand).map(([field, val]) => {
-						data[field] = val
-					})
-				}
-				return Ok(data as T)
+				const finalData = expandRelation(data)
+
+				return Ok(finalData as T)
 			} catch (e) {
 				return match((e as ClientResponseError).status).case({
 					404: () =>

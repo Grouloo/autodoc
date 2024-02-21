@@ -9,7 +9,7 @@ const { slug } = Astro.params
 const { dependencies } = Astro.locals
 
 const formError = await onSubmit(Astro, addSectionForm, async (input) => {
-	const addSectionResult = await ArticleCommands.addSection(
+	const addSectionResult = await ArticleCommands.addSectionFromUrl(
 		slug as string,
 		input,
 		dependencies,

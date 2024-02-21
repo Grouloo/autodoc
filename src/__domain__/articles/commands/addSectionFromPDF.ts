@@ -1,16 +1,14 @@
-import type { LLM, NotFound, UnexpectedError } from '@__domain__/__abstract__'
 import type { DB } from '@__domain__/__data-access__'
 import type { ArticleSlug } from '../__types__/ArticleSlug'
+import type { LLM } from '@__domain__/__abstract__'
 import { ArticleQueries } from '../ArticleQueries'
-import type { Article, ArticleTag } from '../Article'
-import { ArticleGPT } from '../ArticleGPT'
-import type { URL } from '@__domain__/__types__'
 import { ArticleRepository } from '../ArticleRepository'
-import type { AsyncResult } from 'shulk'
+import { ArticleGPT } from '../ArticleGPT'
+import { NotGenerated, articleIsGenerated } from '../Article'
 
-export type AddSectionForm = {
+export type AddSectionPDFForm = {
 	title: string
-	source: URL
+	source: File
 }
 
 type Dependencies = {
@@ -18,11 +16,11 @@ type Dependencies = {
 	llm: LLM
 }
 
-export async function addSection(
+export async function addSectionFromPDF(
 	slug: ArticleSlug,
-	input: AddSectionForm,
+	input: AddSectionPDFForm,
 	dependencies: Dependencies,
-): AsyncResult<UnexpectedError | NotFound | NotGenerated, Article> {
+) {
 	const { db, llm } = dependencies
 
 	const readArticleResult = await ArticleQueries(db).fromSlug(slug)
@@ -30,7 +28,11 @@ export async function addSection(
 	const patchedArticle = await readArticleResult
 		.filterType(articleIsGenerated, NotGenerated.new)
 		.flatMapAsync((article) =>
-			ArticleGPT(llm).generateSection(article, input.title, input.source),
+			ArticleGPT(llm).generateSectionFromPDF(
+				article,
+				input.title,
+				input.source,
+			),
 		)
 
 	const updateArticleResult = await patchedArticle.flatMapAsync(
@@ -38,13 +40,4 @@ export async function addSection(
 	)
 
 	return updateArticleResult.flatMap(() => patchedArticle)
-}
-
-const articleIsGenerated = (art: Article): art is ArticleTag['Generated'] =>
-	art._state === 'Generated'
-
-class NotGenerated extends Error {
-	static new() {
-		return new NotGenerated()
-	}
 }

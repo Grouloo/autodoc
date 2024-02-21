@@ -13,10 +13,13 @@ interface Props {
 const { article } = Astro.props
 ---
 
-<div id="ShowArticle" x-data="{ generating: false, isAddSectionOpen: false }">
-	<h1>{article.title}</h1>
-
+<div
+	id="ShowArticle"
+	x-data="{ generating: false, isAddSectionUrlOpen: false }"
+>
 	<Segment>
+		<h1 style="margin-top: 0;">{article.title}</h1>
+
 		{
 			match(article).case({
 				Pending: () => (
@@ -31,48 +34,75 @@ const { article } = Astro.props
 					</Button>
 				),
 				Generated: () => (
-					<Button
-						primary
-						icon={'add'}
-						x-on:click="isAddSectionOpen = true"
-					>
-						Add a section
-					</Button>
+					<>
+						<Button
+							primary
+							icon={'add'}
+							x-on:click="isAddSectionUrlOpen = true"
+						>
+							Add a section (URL)
+						</Button>
+						<Button
+							primary
+							icon={'picture_as_pdf'}
+							x-on:click="isAddSectionPdfOpen = true"
+						>
+							Add a section (PDF)
+						</Button>
+					</>
 				),
 			})
 		}
-	</Segment>
 
-	<Modal title="Add a section" open="isAddSectionOpen">
-		<AddSectionForm articleSlug={article.slug} />
-	</Modal>
+		<Divider />
 
-	<Divider hidden />
+		<Modal title="Add a section" open="isAddSectionUrlOpen">
+			<AddSectionForm articleSlug={article.slug} />
+		</Modal>
 
-	{
-		article._state === 'Generated' && (
-			<Segment>
-				<section>{article.description.content}</section>
-
-				{article.sections.map((section) => (
+		{
+			article._state === 'Generated' && (
+				<div>
 					<section>
-						<h2>{section.title}</h2>
-						<p>
-							{section.content.split('\n').map((part) => (
-								<p>{part}</p>
-							))}
-						</p>
+						{article.description.content.split('\n').map((part) => (
+							<p>{part}</p>
+						))}
 					</section>
-				))}
 
-				<h2>Related to</h2>
+					{article.sections.map((section) => (
+						<section>
+							<h2>{section.title}</h2>
+							<p>
+								{section.content.split('\n').map((part) => (
+									<p>{part}</p>
+								))}
+							</p>
 
-				{article.relatedTo.map((art) => (
-					<a href={'/articles/' + art.slug} style="text-decoration: none;">
-						<Button>{art.title}</Button>
-					</a>
-				))}
-			</Segment>
-		)
-	}
+							<h3>Sources</h3>
+							{section._state === 'Sourced' &&
+								section.sources.map((source, i) => (
+									<p>
+										[{i + 1}]{' '}
+										<a href={source.url} target="_blank">
+											{source.title}
+										</a>
+									</p>
+								))}
+						</section>
+					))}
+
+					<h2>Related to</h2>
+
+					{article.relatedTo.map((art) => (
+						<a
+							href={'/articles/' + art.slug}
+							style="text-decoration: none;"
+						>
+							<Button>{art.title}</Button>
+						</a>
+					))}
+				</div>
+			)
+		}
+	</Segment>
 </div>

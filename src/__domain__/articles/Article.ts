@@ -18,6 +18,16 @@ export type Quality = {
 	score: Percentage
 }
 
+export const articleIsGenerated = (
+	art: Article,
+): art is ArticleTag['Generated'] => art._state === 'Generated'
+
+export class NotGenerated extends Error {
+	static new() {
+		return new NotGenerated()
+	}
+}
+
 export const Article = union<{
 	Pending: {
 		slug: ArticleSlug
@@ -28,7 +38,7 @@ export const Article = union<{
 		title: string
 		description: Section
 		sections: Section[]
-		relatedTo: { _state: 'Pending'; slug: ArticleSlug; title: string }[]
+		relatedTo: { slug: ArticleSlug; title: string }[]
 		quality: Quality
 	}
 }>()

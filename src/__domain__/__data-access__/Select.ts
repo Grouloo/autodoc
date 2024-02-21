@@ -45,7 +45,7 @@ export class Select<T> {
 		return this
 	}
 
-	sortBy(field: keyof T, order: 'ASC' | 'DESC') {
+	orderBy(field: keyof T, order: 'ASC' | 'DESC') {
 		this.sortings.push({ field: field as string, order })
 		return this
 	}

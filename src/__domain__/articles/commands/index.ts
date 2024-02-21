@@ -1,6 +1,6 @@
 import { create, type ArticleCreationForm } from './create'
 import { generate } from './generate'
-import { addSection, type AddSectionForm } from './addSection'
+import { addSectionFromUrl, type AddSectionForm } from './addSectionFromUrl'
 
 export type { ArticleCreationForm, AddSectionForm }
-export { create, generate, addSection }
+export { create, generate, addSectionFromUrl }

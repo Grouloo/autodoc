@@ -7,6 +7,6 @@ export function ArticleQueries(db: DB) {
 	return {
 		fromSlug: (slug: string) => repository.read(slug),
 
-		listAll: () => repository.selectAll().sortBy('title', 'ASC').exec(),
+		listAll: () => repository.selectAll().orderBy('title', 'ASC').exec(),
 	}
 }

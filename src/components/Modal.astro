@@ -9,9 +9,9 @@ const { title, open } = Astro.props
 //x-on:click={`${open} = false`}
 ---
 
-<div x-bind:class={`${open} ? "" : "hidden"`}>
-	<div aria-hidden="true" class="layer">
-		<section class="modal">
+<div x-show={`${open}`}>
+	<div id="ModalBackground" aria-hidden="true" class="layer">
+		<section class="modal" x-on:click.away={`${open} = false`}>
 			<h2>{title}</h2>
 			<slot />
 		</section>

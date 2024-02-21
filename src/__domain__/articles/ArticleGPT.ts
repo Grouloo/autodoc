@@ -43,12 +43,10 @@ export function ArticleGPT(llm: LLM) {
 							content: response.description,
 						}),
 						sections: [],
-						relatedTo: response.relatedTo.map((title) =>
-							Article.Pending({
-								slug: createArticleSlug(title),
-								title,
-							}),
-						),
+						relatedTo: response.relatedTo.map((title) => ({
+							slug: createArticleSlug(title),
+							title,
+						})),
 						quality: {
 							sourcedSections: 0,
 							totalSections: 1,
@@ -85,6 +83,41 @@ export function ArticleGPT(llm: LLM) {
 							sources: [
 								{ title: docTitle || sourceUrl, url: sourceUrl },
 							],
+						}),
+					],
+					// quality: {
+					// 	sourcedSections: article.quality.sourcedSections + 1,
+					// 	totalSections: article.quality.totalSections + 1,
+					// 	score:
+					// 		(article.quality.sourcedSections + 1) /
+					// 		(article.quality.totalSections + 1),
+					// },
+				}),
+			)
+		},
+
+		generateSectionFromPDF: async (
+			article: ArticleTag['Generated'],
+			sectionTitle: string,
+			sourcePDF: File,
+		) => {
+			const doc = await sourcePDF.text()
+
+			await llm.addDocument(doc)
+
+			const queryResult = await llm.query(
+				GENERATE_SECT_PROMPT(article.title, sectionTitle),
+			)
+
+			return queryResult.map((res) =>
+				Article.Generated({
+					...article,
+					sections: [
+						...article.sections,
+						Section.Sourced({
+							title: sectionTitle,
+							content: res,
+							sources: [{ title: sourcePDF.name, url: sourcePDF.name }],
 						}),
 					],
 					// quality: {

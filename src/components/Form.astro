@@ -22,6 +22,8 @@ type Props = {
 }
 
 const { definition, error } = Astro.props
+
+const query = new URLSearchParams(Astro.url.search)
 ---
 
 <form
@@ -52,7 +54,10 @@ const { definition, error } = Astro.props
 									name={name}
 									required={field.required}
 									placeholder={field.placeholder || field.label}
-									value={error?.formData.get(name)?.toString()}
+									value={
+										error?.formData.get(name)?.toString() ||
+										query.get(name)
+									}
 								/>
 							</div>
 						),
@@ -82,6 +87,12 @@ const { definition, error } = Astro.props
 	<div class="form-footer">
 		<Button primary icon="send" loadOnClick> Submit </Button>
 	</div>
+
+	<script>
+		document.querySelectorAll('.field').forEach((el) => {
+			el.addEventListener('click', () => el.querySelector('input')?.focus())
+		})
+	</script>
 </form>
 
 <style>

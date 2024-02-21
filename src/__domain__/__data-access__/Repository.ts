@@ -20,12 +20,29 @@ export type Schema<T> = {
 	}
 }
 
+function buildJoins(schema: Schema<any>, prefix?: string) {
+	const relationSchemas = Object.entries(schema.relations).filter(
+		(entry): entry is [string, Schema<any>] => entry[1] !== false,
+	)
+
+	const joins: string[] = [
+		...relationSchemas.map(([field]) =>
+			prefix ? prefix + '.' + field : field,
+		),
+		...relationSchemas.flatMap(([field, schema]) =>
+			buildJoins(schema, prefix ? prefix + '.' + field : field),
+		),
+	]
+
+	return joins
+}
+
 export function $repository<T extends object>(schema: Schema<T>) {
 	const collection = schema.table
 
-	const joins = Object.entries(schema.relations)
-		.filter((entry): entry is [string, Schema<any>] => entry[1] !== false)
-		.map(([field]) => field)
+	const joins = buildJoins(schema)
+
+	console.log('joins', joins)
 
 	return (db: DB) => ({
 		insert: async (
@@ -45,21 +62,38 @@ export function $repository<T extends object>(schema: Schema<T>) {
 			const normalForm: Record<string, any> = {}
 
 			for (let [prop, propScheme] of Object.entries(schema.relations)) {
-				if (propScheme !== false && data[prop as keyof T]) {
+				const value = data[prop as keyof T]
+
+				if (propScheme !== false) {
 					// @ts-expect-error
 					const propRepo = $repository(propScheme as Schema<T[keyof T]>)(
 						db,
 					)
 
-					const propIdResult = await propRepo.insert(
-						data[prop as keyof T] as any,
-					)
+					if (value && !Array.isArray(value)) {
+						const propIdResult = await propRepo.insert(value)
 
-					if (propIdResult._state === 'Err') {
-						return Err(propIdResult.val)
+						if (propIdResult._state === 'Err') {
+							return Err(propIdResult.val)
+						}
+
+						normalForm[prop] = propIdResult.val.id
+					} else if (Array.isArray(value)) {
+						let IDs: string[] = []
+
+						for (let entry of value) {
+							const propIdResult = await propRepo.upsert(entry)
+
+							if (propIdResult._state === 'Err') {
+								return Err(propIdResult.val)
+							}
+
+							// @ts-expect-error
+							IDs.push(propIdResult.val.id)
+						}
+
+						normalForm[prop] = IDs
 					}
-
-					normalForm[prop] = propIdResult.val.id
 				} else {
 					normalForm[prop] = data[prop as keyof T]
 				}
