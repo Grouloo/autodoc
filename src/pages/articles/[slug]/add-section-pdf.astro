@@ -1,6 +1,6 @@
 ---
-import { addSectionForm } from '@components/Articles/AddSectionForm'
-import AddSectionForm from '@components/Articles/AddSectionForm.astro'
+import { addSectionPDFForm } from '@components/Articles/AddSectionPDFForm'
+import AddSectionPDFForm from '@components/Articles/AddSectionPDFForm.astro'
 import Card from '@components/Card.astro'
 import { onSubmit } from '@components/Form'
 import { ArticleCommands } from '@domain'
@@ -8,8 +8,8 @@ import { ArticleCommands } from '@domain'
 const { slug } = Astro.params
 const { dependencies } = Astro.locals
 
-const formError = await onSubmit(Astro, addSectionForm, async (input) => {
-	const addSectionResult = await ArticleCommands.addSectionFromUrl(
+const formError = await onSubmit(Astro, addSectionPDFForm, async (input) => {
+	const addSectionResult = await ArticleCommands.addSectionFromPDF(
 		slug as string,
 		input,
 		dependencies,
@@ -27,4 +27,4 @@ const formError = await onSubmit(Astro, addSectionForm, async (input) => {
 
 {formError && <Card error>{formError.message}</Card>}
 
-<AddSectionForm articleSlug={slug as string} />
+<AddSectionPDFForm articleSlug={slug as string} />

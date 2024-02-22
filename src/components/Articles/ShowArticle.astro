@@ -3,9 +3,12 @@ import type { Article } from '@domain'
 import Segment from '../Segment.astro'
 import Button from '../Button.astro'
 import Modal from '../Modal.astro'
+import Breadcrumbs from '../Breadcrumbs.astro'
 import Divider from '@components/Divider.astro'
 import { match } from 'shulk'
 import AddSectionForm from './AddSectionForm.astro'
+import AddSectionPDFForm from './AddSectionPDFForm.astro'
+import WriteDescriptonForm from './WriteDescriptonForm.astro'
 interface Props {
 	article: Article
 }
@@ -15,23 +18,41 @@ const { article } = Astro.props
 
 <div
 	id="ShowArticle"
-	x-data="{ generating: false, isAddSectionUrlOpen: false }"
+	x-data="{ isWriteDescrOpen: false, isAddSectionUrlOpen: false, isAddSectionPDFOpen: false }"
 >
+	<Breadcrumbs
+		path={[
+			{ title: 'Articles', url: '/articles/' },
+			{ title: article.title },
+		]}
+	/>
+
 	<Segment>
 		<h1 style="margin-top: 0;">{article.title}</h1>
 
 		{
 			match(article).case({
 				Pending: () => (
-					<Button
-						primary
-						icon={'text_select_move_forward_character'}
-						hx-patch={'/articles/' + article.slug + '/generate'}
-						hx-target="#ShowArticle"
-						loadOnClick
-					>
-						Generate
-					</Button>
+					<>
+						<Button
+							primary
+							icon={'text_select_move_forward_character'}
+							hx-patch={'/articles/' + article.slug + '/generate'}
+							hx-target="#ShowArticle"
+							loadOnClick
+						>
+							Generate a description
+						</Button>
+						<Button
+							icon={'edit_note'}
+							x-on:click="isWriteDescrOpen = true"
+						>
+							Write a description
+						</Button>{' '}
+						<Modal title="Write a description" open="isWriteDescrOpen">
+							<WriteDescriptonForm articleSlug={article.slug} />
+						</Modal>
+					</>
 				),
 				Generated: () => (
 					<>
@@ -42,13 +63,20 @@ const { article } = Astro.props
 						>
 							Add a section (URL)
 						</Button>
+
 						<Button
 							primary
 							icon={'picture_as_pdf'}
-							x-on:click="isAddSectionPdfOpen = true"
+							x-on:click="isAddSectionPDFOpen = true"
 						>
 							Add a section (PDF)
 						</Button>
+						<Modal title="Add a section" open="isAddSectionUrlOpen">
+							<AddSectionForm articleSlug={article.slug} />
+						</Modal>
+						<Modal title="Add a section" open="isAddSectionPDFOpen">
+							<AddSectionPDFForm articleSlug={article.slug} />
+						</Modal>
 					</>
 				),
 			})
@@ -56,9 +84,13 @@ const { article } = Astro.props
 
 		<Divider />
 
-		<Modal title="Add a section" open="isAddSectionUrlOpen">
-			<AddSectionForm articleSlug={article.slug} />
-		</Modal>
+		{
+			article._state === 'Pending' && (
+				<h3 style="text-align: center;">
+					This article has no content yet.
+				</h3>
+			)
+		}
 
 		{
 			article._state === 'Generated' && (
@@ -83,9 +115,13 @@ const { article } = Astro.props
 								section.sources.map((source, i) => (
 									<p>
 										[{i + 1}]{' '}
-										<a href={source.url} target="_blank">
-											{source.title}
-										</a>
+										{source.url ? (
+											<a href={source.url} target="_blank">
+												{source.title}
+											</a>
+										) : (
+											<i>{source.title}</i>
+										)}
 									</p>
 								))}
 						</section>

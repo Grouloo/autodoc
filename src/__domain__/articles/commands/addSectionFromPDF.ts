@@ -8,6 +8,7 @@ import { NotGenerated, articleIsGenerated } from '../Article'
 
 export type AddSectionPDFForm = {
 	title: string
+	sourceTitle: string
 	source: File
 }
 
@@ -32,6 +33,7 @@ export async function addSectionFromPDF(
 				article,
 				input.title,
 				input.source,
+				input.sourceTitle,
 			),
 		)
 

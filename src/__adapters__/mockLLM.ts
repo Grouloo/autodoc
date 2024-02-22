@@ -14,11 +14,11 @@ export function mockLLM(): LLM {
 			}
 		},
 
-		addDocument: () => {
-			throw Error()
+		addDocument: async () => {
+			return {}
 		},
 
-		query: (_msg) => {
+		query: async (_msg) => {
 			throw Error()
 		},
 	}

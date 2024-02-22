@@ -4,7 +4,7 @@ import type { ArticleSlug } from './__types__/ArticleSlug'
 
 type BaseSection = { title: string; content: string }
 
-export type Source = { title: string; url: string }
+export type Source = { title: string; url?: string }
 
 export const Section = union<{
 	NotSourced: BaseSection
@@ -25,6 +25,16 @@ export const articleIsGenerated = (
 export class NotGenerated extends Error {
 	static new() {
 		return new NotGenerated()
+	}
+}
+
+export const articleIsPending = (
+	article: Article,
+): article is ArticleTag['Pending'] => article._state === 'Pending'
+
+export class AlreadyGenerated extends Error {
+	static new() {
+		return new AlreadyGenerated()
 	}
 }
 

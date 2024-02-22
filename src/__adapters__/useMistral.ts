@@ -9,6 +9,7 @@ import {
 	MistralAIEmbeddingModelType,
 	MistralAI,
 } from 'llamaindex'
+
 import { Err, Ok } from 'shulk'
 
 export async function useMistral(): Promise<LLM> {

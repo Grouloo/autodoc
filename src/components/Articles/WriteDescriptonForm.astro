@@ -1,0 +1,18 @@
+---
+import type { ArticleSlug } from '@__domain__/articles/__types__/ArticleSlug'
+import { writeDescriptonForm } from './WriteDescriptionForm'
+import Form from '@components/Form.astro'
+
+interface Props {
+	articleSlug: ArticleSlug
+}
+
+const { articleSlug } = Astro.props
+---
+
+<Form
+	definition={writeDescriptonForm}
+	cols={1}
+	error={undefined}
+	hx-post={'/articles/' + articleSlug + '/write-description'}
+/>

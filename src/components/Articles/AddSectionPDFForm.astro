@@ -1,0 +1,17 @@
+---
+import Form from '../Form.astro'
+import { addSectionPDFForm } from './AddSectionPDFForm'
+
+interface Props {
+	articleSlug: string
+}
+
+const { articleSlug } = Astro.props
+---
+
+<Form
+	definition={addSectionPDFForm}
+	cols={1}
+	error={undefined}
+	hx-post={'/articles/' + articleSlug + '/add-section-pdf'}
+/>

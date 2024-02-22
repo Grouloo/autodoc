@@ -1,0 +1,27 @@
+---
+interface Props {
+	path: { title: string; url?: string }[]
+}
+
+const { path } = Astro.props
+---
+
+<div class="breadcrumbs">
+	{
+		path.flatMap((part, i) => [
+			<a href={part.url}>{part.title}</a>,
+			i < path.length - 1 ? <a>{' / '}</a> : null,
+		])
+	}
+</div>
+
+<style>
+	.breadcrumbs {
+		margin-bottom: 15px;
+	}
+
+	.breadcrumbs a[href] {
+		text-decoration: none;
+		color: rgb(65, 96, 253) !important;
+	}
+</style>

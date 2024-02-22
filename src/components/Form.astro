@@ -28,6 +28,7 @@ const query = new URLSearchParams(Astro.url.search)
 
 <form
 	id="form"
+	enctype="multipart/form-data"
 	method={!Astro.props['hx-post'] ? 'POST' : undefined}
 	hx-post={Astro.props['hx-post']}
 >
@@ -72,6 +73,37 @@ const query = new URLSearchParams(Astro.url.search)
 									required={field.required}
 									placeholder={field.placeholder || field.label}
 									value={error?.formData.get(name)?.toString()}
+								/>
+							</div>
+						),
+						File: (c) => (
+							<div class="field">
+								<label for={name}>{field.label}</label>
+
+								<input
+									type="file"
+									accept={c.accept.join(',')}
+									id={name}
+									name={name}
+									required={field.required}
+									placeholder={field.placeholder || field.label}
+									value={error?.formData.get(name)?.toString()}
+								/>
+							</div>
+						),
+						TextArea: () => (
+							<div class="field">
+								<label for={name}>{field.label}</label>
+
+								<textarea
+									id={name}
+									name={name}
+									required={field.required}
+									placeholder={field.placeholder || field.label}
+									value={
+										error?.formData.get(name)?.toString() ||
+										query.get(name)
+									}
 								/>
 							</div>
 						),
@@ -136,6 +168,16 @@ const query = new URLSearchParams(Astro.url.search)
 		outline: none;
 		background-color: inherit;
 		font-size: medium;
+	}
+
+	textarea {
+		width: 100%;
+		border: none;
+		outline: none;
+		background-color: inherit;
+		font-size: medium;
+		font-family: inherit;
+		resize: vertical;
 	}
 
 	.form-footer {

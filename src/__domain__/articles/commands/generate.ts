@@ -1,7 +1,7 @@
 import type { DB } from '../../__data-access__'
 import type { ArticleSlug } from '../__types__/ArticleSlug'
 import { ArticleQueries } from '../ArticleQueries'
-import type { Article, ArticleTag } from '../Article'
+import { AlreadyGenerated, articleIsPending, type Article } from '../Article'
 import type { LLM } from '../../__abstract__/LLM'
 import { ArticleGPT } from '../ArticleGPT'
 import { ArticleRepository } from '../ArticleRepository'
@@ -30,13 +30,4 @@ export async function generate(
 	)
 
 	return updateArticleResult.flatMap(() => generateArticleResult)
-}
-
-const articleIsPending = (article: Article): article is ArticleTag['Pending'] =>
-	article._state === 'Pending'
-
-class AlreadyGenerated extends Error {
-	static new() {
-		return new AlreadyGenerated()
-	}
 }

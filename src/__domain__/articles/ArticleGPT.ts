@@ -4,6 +4,7 @@ import { createArticleSlug } from './__types__/ArticleSlug'
 import type { AsyncResult } from 'shulk'
 import { UnexpectedError } from '../__abstract__'
 import type { URL } from '@__domain__/__types__'
+import { pdfToText } from 'pdf-ts'
 
 const GENERATE_DESCR_PROMPT = (title: string) =>
 	`Give me information about the topic "${title}". Your response will be formatted according to this JSON-like structure: {"description": string, "relatedTo": string[]}`
@@ -100,10 +101,15 @@ export function ArticleGPT(llm: LLM) {
 			article: ArticleTag['Generated'],
 			sectionTitle: string,
 			sourcePDF: File,
+			sourceTitle: string,
 		) => {
-			const doc = await sourcePDF.text()
+			const buffer = await sourcePDF.arrayBuffer()
+			const text = (await pdfToText(Buffer.from(buffer))).replaceAll(
+				'\n',
+				'',
+			)
 
-			await llm.addDocument(doc)
+			await llm.addDocument(text)
 
 			const queryResult = await llm.query(
 				GENERATE_SECT_PROMPT(article.title, sectionTitle),
@@ -117,7 +123,7 @@ export function ArticleGPT(llm: LLM) {
 						Section.Sourced({
 							title: sectionTitle,
 							content: res,
-							sources: [{ title: sourcePDF.name, url: sourcePDF.name }],
+							sources: [{ title: sourceTitle }],
 						}),
 					],
 					// quality: {
