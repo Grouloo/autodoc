@@ -25,7 +25,7 @@ function expandRelation(data: any) {
 }
 
 export async function connectPocketBase() {
-	const pb = new PocketBase('http://127.0.0.1:8090')
+	const pb = new PocketBase(import.meta.env.SECRET_DB_URL)
 
 	await pb
 		.collection('applications')
