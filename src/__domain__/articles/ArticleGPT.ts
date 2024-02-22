@@ -7,10 +7,10 @@ import type { URL } from '@__domain__/__types__'
 import { pdfToText } from 'pdf-ts'
 
 const GENERATE_DESCR_PROMPT = (title: string) =>
-	`Give me information about the topic "${title}". Your response will be formatted according to this JSON-like structure: {"description": string, "relatedTo": string[]}`
+	`Give me information about the topic "${title}". Your response will be formatted according to this JSON-like structure: {"description": string, "relatedTo": string[]}. Do not make up facts, if you are unsure about your answer, keep it short and straightforward with basic information.`
 
 const GENERATE_SECT_PROMPT = (articleTitle: string, sectionTitle: string) =>
-	`Write a section "${sectionTitle}" for an encyclopedia article about ${articleTitle}. Reply with only the content of the subsection without its title, and nothing else. Make it as complete, formal, objective, and unbiased as possible.`
+	`Write a section "${sectionTitle}" for an encyclopedia article about ${articleTitle}, by using the provided context. Reply with only the content of the subsection without its title, and nothing else. Make it as complete, formal, objective, and unbiased as possible. Only use facts you are sure about, and leave out what you are unsure about.`
 
 type GenerateResponse = { description: string; relatedTo: string[] }
 
