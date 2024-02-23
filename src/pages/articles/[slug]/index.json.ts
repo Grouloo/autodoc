@@ -16,31 +16,48 @@ export const GET: APIRoute = async (Astro) => {
 					title: article.title,
 					actions: [
 						{
-							title: 'Generate',
+							title: 'Generate a description',
 							method: 'PATCH',
 							uri: '/articles/' + article.slug + '/generate',
+						},
+						{
+							title: 'Write a description',
+							method: 'POST',
+							uri: '/articles/' + article.slug + '/write-description',
 						},
 					],
 				}),
 				Generated: (article) => ({
 					title: article.title,
+					actions: [
+						{
+							title: 'Add a section (URL)',
+							method: 'POST',
+							uri: '/articles/' + article.slug + '/add-section-url',
+						},
+						{
+							title: 'Add a section (PDF)',
+							method: 'POST',
+							uri: '/articles/' + article.slug + '/add-section-pdf',
+						},
+					],
 					description: article.description.content,
 					sections: article.sections.map((sec) => ({
 						title: sec.title,
 						content: sec.content,
+						sources:
+							sec._state === 'Sourced'
+								? sec.sources.map((source) => ({
+										title: source.title,
+										url: source.url,
+									}))
+								: undefined,
 					})),
 					relatedTo: article.relatedTo.map((a) => ({
 						title: a.title,
 						slug: a.slug,
 						uri: '/articles/' + a.slug + '.json',
 					})),
-					actions: [
-						{
-							title: 'Add a section',
-							method: 'POST',
-							uri: '/articles/' + article.slug + '/add-section',
-						},
-					],
 				}),
 			}),
 		)
